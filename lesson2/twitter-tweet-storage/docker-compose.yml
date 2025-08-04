@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./src/api:/app/src/api
+    command: sh -c "npm run server & npm run preview"
+    
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: twitter_clone
+      POSTGRES_USER: twitter
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
