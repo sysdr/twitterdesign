@@ -1,0 +1,331 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #15202b;
+  color: #ffffff;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.app-header {
+  background-color: #192734;
+  padding: 1rem;
+  border-bottom: 1px solid #2f3336;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-header h1 {
+  color: #1da1f2;
+  font-size: 1.5rem;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-switcher select {
+  background-color: #192734;
+  color: white;
+  border: 1px solid #2f3336;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-indicator {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.status-indicator.connected {
+  background-color: #1d9bf0;
+  color: white;
+}
+
+.status-indicator.disconnected {
+  background-color: #f4212e;
+  color: white;
+}
+
+.main-content {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+.sidebar {
+  width: 300px;
+  background-color: #192734;
+  padding: 1rem;
+  border-right: 1px solid #2f3336;
+}
+
+.connection-info,
+.demo-instructions {
+  margin-bottom: 2rem;
+}
+
+.connection-info h3,
+.demo-instructions h3 {
+  color: #1da1f2;
+  margin-bottom: 0.5rem;
+}
+
+.connection-info p {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #8b98a5;
+}
+
+.demo-instructions ol {
+  padding-left: 1.5rem;
+  color: #8b98a5;
+}
+
+.demo-instructions li {
+  margin-bottom: 0.5rem;
+}
+
+.timeline-container {
+  flex: 1;
+  padding: 1rem;
+}
+
+.timeline {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.tweet-composer {
+  background-color: #192734;
+  border: 1px solid #2f3336;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tweet-composer textarea {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  resize: none;
+  outline: none;
+}
+
+.tweet-composer textarea::placeholder {
+  color: #8b98a5;
+}
+
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.char-count {
+  color: #8b98a5;
+  font-size: 0.9rem;
+}
+
+.tweet-btn {
+  background-color: #1d9bf0;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tweet-btn:disabled {
+  background-color: #2f3336;
+  cursor: not-allowed;
+}
+
+.tweet {
+  background-color: #192734;
+  border: 1px solid #2f3336;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tweet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.author {
+  color: #1da1f2;
+  font-weight: bold;
+}
+
+.time {
+  color: #8b98a5;
+  font-size: 0.9rem;
+}
+
+.tweet-content {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.tweet-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.like-btn,
+.retweet-btn {
+  background: none;
+  border: none;
+  color: #8b98a5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.like-btn:hover {
+  color: #f91880;
+}
+
+.retweet-btn:hover {
+  color: #00ba7c;
+}
+
+.notifications-toggle,
+.stats-toggle {
+  background-color: #1d9bf0;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.notifications-dropdown,
+.stats-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #192734;
+  border: 1px solid #2f3336;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 300px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.notifications-header button {
+  background: none;
+  border: 1px solid #2f3336;
+  color: #8b98a5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.notification-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid #2f3336;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-content {
+  margin-bottom: 0.25rem;
+}
+
+.notification-time {
+  color: #8b98a5;
+  font-size: 0.8rem;
+}
+
+.no-notifications {
+  text-align: center;
+  color: #8b98a5;
+  padding: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1da1f2;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #8b98a5;
+  margin-top: 0.25rem;
+}
+
+.notification-panel,
+.stats-panel {
+  position: relative;
+  display: inline-block;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #8b98a5;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    order: 2;
+  }
+  
+  .timeline-container {
+    order: 1;
+  }
+}
