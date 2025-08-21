@@ -1,0 +1,51 @@
+{
+  "name": "twitter-api-rate-limiting",
+  "version": "1.0.0",
+  "description": "Twitter API with Rate Limiting - Lesson 7",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:integration": "jest --config jest.integration.config.js",
+    "test:load": "k6 run src/tests/load/load-test.js",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "redis": "^4.6.13",
+    "ioredis": "^5.3.2",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.2.0",
+    "compression": "^1.7.4",
+    "express-validator": "^7.0.1",
+    "winston": "^3.13.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/morgan": "^1.9.9",
+    "@types/jest": "^29.5.12",
+    "@types/supertest": "^6.0.2",
+    "typescript": "^5.4.5",
+    "tsx": "^4.9.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "supertest": "^7.0.0",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "prettier": "^3.2.5"
+  }
+}
