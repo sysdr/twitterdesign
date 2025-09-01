@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  # Blue Environment
+  frontend-blue:
+    build: ./frontend
+    container_name: twitter-frontend-blue
+    ports:
+      - "3001:80"
+    environment:
+      - VITE_APP_API_URL=http://backend-blue:5000
+      - VITE_APP_ENVIRONMENT=blue
+    depends_on:
+      - backend-blue
+    networks:
+      - blue-network
+
+  backend-blue:
+    build: ./backend
+    container_name: twitter-backend-blue
+    ports:
+      - "5001:5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@postgres-blue:5432/twitter_db
+      - REDIS_URL=redis://redis-blue:6379
+      - JWT_SECRET=blue-env-secret-key
+    depends_on:
+      - postgres-blue
+      - redis-blue
+    networks:
+      - blue-network
+
+  postgres-blue:
+    image: postgres:16-alpine
+    container_name: postgres-blue
+    environment:
+      - POSTGRES_DB=twitter_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_blue_data:/var/lib/postgresql/data
+    networks:
+      - blue-network
+
+  redis-blue:
+    image: redis:7-alpine
+    container_name: redis-blue
+    volumes:
+      - redis_blue_data:/data
+    networks:
+      - blue-network
+
+  # Green Environment
+  frontend-green:
+    build: ./frontend
+    container_name: twitter-frontend-green
+    ports:
+      - "3002:80"
+    environment:
+      - VITE_APP_API_URL=http://backend-green:5000
+      - VITE_APP_ENVIRONMENT=green
+    depends_on:
+      - backend-green
+    networks:
+      - green-network
+
+  backend-green:
+    build: ./backend
+    container_name: twitter-backend-green
+    ports:
+      - "5002:5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@postgres-green:5432/twitter_db
+      - REDIS_URL=redis://redis-green:6379
+      - JWT_SECRET=green-env-secret-key
+    depends_on:
+      - postgres-green
+      - redis-green
+    networks:
+      - green-network
+
+  postgres-green:
+    image: postgres:16-alpine
+    container_name: postgres-green
+    environment:
+      - POSTGRES_DB=twitter_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_green_data:/var/lib/postgresql/data
+    networks:
+      - green-network
+
+  redis-green:
+    image: redis:7-alpine
+    container_name: redis-green
+    volumes:
+      - redis_green_data:/data
+    networks:
+      - green-network
+
+  # Load Balancer
+  nginx-lb:
+    image: nginx:alpine
+    container_name: nginx-load-balancer
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend-blue
+      - frontend-green
+    networks:
+      - blue-network
+      - green-network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - blue-network
+      - green-network
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - blue-network
+      - green-network
+
+volumes:
+  postgres_blue_data:
+  postgres_green_data:
+  redis_blue_data:
+  redis_green_data:
+  grafana_data:
+
+networks:
+  blue-network:
+    driver: bridge
+  green-network:
+    driver: bridge

@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+
+scrape_configs:
+  - job_name: 'twitter-mvp-blue'
+    static_configs:
+      - targets: ['backend-blue:5000']
+    metrics_path: /api/health/metrics
+    scrape_interval: 5s
+
+  - job_name: 'twitter-mvp-green'
+    static_configs:
+      - targets: ['backend-green:5000']
+    metrics_path: /api/health/metrics
+    scrape_interval: 5s
+
+  - job_name: 'nginx-load-balancer'
+    static_configs:
+      - targets: ['nginx-lb:80']
+    metrics_path: /health
+    scrape_interval: 5s
