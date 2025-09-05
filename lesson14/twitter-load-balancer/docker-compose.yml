@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  load-balancer-dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+  # Mock backend servers for testing
+  mock-server-1:
+    image: nginx:alpine
+    ports:
+      - "8001:80"
+    volumes:
+      - ./mock-server.conf:/etc/nginx/nginx.conf
+
+  mock-server-2:
+    image: nginx:alpine
+    ports:
+      - "8002:80"
+    volumes:
+      - ./mock-server.conf:/etc/nginx/nginx.conf
+
+volumes:
+  redis-data:
