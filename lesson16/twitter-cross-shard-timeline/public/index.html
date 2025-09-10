@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Shard Timeline System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-white mb-8 text-center">
+            📊 Cross-Shard Timeline System
+        </h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Timeline Generation -->
+            <div class="card rounded-lg p-6 border border-white/20">
+                <h2 class="text-xl font-semibold text-white mb-4">🕒 Timeline Generation</h2>
+                <div class="space-y-4">
+                    <input type="text" id="userId" placeholder="Enter User ID (e.g., user_0_5)" 
+                           class="w-full p-2 rounded bg-white/20 text-white placeholder-white/60 border border-white/30">
+                    <button onclick="generateTimeline()" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                        Generate Timeline
+                    </button>
+                    <div id="timelineResult" class="text-white text-sm"></div>
+                </div>
+            </div>
+            
+            <!-- Shard Status -->
+            <div class="card rounded-lg p-6 border border-white/20">
+                <h2 class="text-xl font-semibold text-white mb-4">🗄️ Shard Status</h2>
+                <button onclick="checkShardStatus()" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 transition-colors">
+                    Check Shard Health
+                </button>
+                <div id="shardStatus" class="text-white text-sm max-h-48 overflow-y-auto"></div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="card rounded-lg p-6 border border-white/20">
+                <h2 class="text-xl font-semibold text-white mb-4">⚡ Performance Metrics</h2>
+                <button onclick="loadMetrics()" 
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mb-4 transition-colors">
+                    Load Metrics
+                </button>
+                <div id="metricsDisplay" class="text-white text-sm"></div>
+            </div>
+        </div>
+        
+        <!-- Timeline Display -->
+        <div class="card rounded-lg p-6 border border-white/20 mb-8">
+            <h2 class="text-xl font-semibold text-white mb-4">📱 User Timeline</h2>
+            <div id="timelineDisplay" class="space-y-3 max-h-96 overflow-y-auto"></div>
+        </div>
+        
+        <!-- Performance Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card rounded-lg p-6 border border-white/20">
+                <h3 class="text-lg font-semibold text-white mb-4">📈 Query Latency</h3>
+                <canvas id="latencyChart" width="400" height="200"></canvas>
+            </div>
+            <div class="card rounded-lg p-6 border border-white/20">
+                <h3 class="text-lg font-semibold text-white mb-4">🎯 Cache Performance</h3>
+                <canvas id="cacheChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let latencyChart, cacheChart;
+        let ws;
+        
+        // Initialize WebSocket connection
+        function initializeWebSocket() {
+            const userId = document.getElementById('userId').value || 'user_0_5';
+            ws = new WebSocket(`ws://localhost:3000?userId=${userId}`);
+            
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                if (message.type === 'timeline_update') {
+                    console.log('Real-time timeline update:', message.data);
+                    showNotification('📱 Timeline updated in real-time!');
+                }
+            };
+        }
+        
+        async function generateTimeline() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                alert('Please enter a User ID');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('timelineResult');
+            const displayDiv = document.getElementById('timelineDisplay');
+            
+            resultDiv.innerHTML = '⏳ Generating timeline...';
+            
+            try {
+                const response = await fetch(`/api/timeline/${userId}?limit=20`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const timeline = result.data;
+                    resultDiv.innerHTML = `✅ Generated ${timeline.length} tweets from multiple shards`;
+                    
+                    // Display timeline
+                    displayDiv.innerHTML = timeline.map(tweet => `
+                        <div class="bg-white/10 rounded p-3 border border-white/20">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="font-semibold text-white">@${tweet.userId}</span>
+                                <span class="text-xs text-white/60">Shard ${tweet.shardId}</span>
+                            </div>
+                            <p class="text-white/90 text-sm mb-2">${tweet.content}</p>
+                            <div class="flex justify-between text-xs text-white/60">
+                                <span>❤️ ${tweet.likesCount} 🔄 ${tweet.retweetsCount}</span>
+                                <span>${new Date(tweet.createdAt).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    initializeWebSocket();
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function checkShardStatus() {
+            const statusDiv = document.getElementById('shardStatus');
+            statusDiv.innerHTML = '⏳ Checking shard status...';
+            
+            try {
+                const response = await fetch('/api/shards/status');
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDiv.innerHTML = result.data.map(shard => `
+                        <div class="mb-2 p-2 bg-white/10 rounded">
+                            <div class="flex justify-between items-center">
+                                <span>Shard ${shard.shardId}</span>
+                                <span class="${shard.status === 'healthy' ? 'text-green-300' : 'text-red-300'}">
+                                    ${shard.status === 'healthy' ? '🟢' : '🔴'} ${shard.status}
+                                </span>
+                            </div>
+                            <div class="text-xs text-white/70 mt-1">
+                                ${shard.tweetCount} tweets | ${shard.totalConnections} connections
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function loadMetrics() {
+            const metricsDiv = document.getElementById('metricsDisplay');
+            
+            try {
+                const response = await fetch('/api/metrics');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const metrics = result.data;
+                    metricsDiv.innerHTML = `
+                        <div class="space-y-2">
+                            <div>📊 Total Queries: ${metrics.totalQueries}</div>
+                            <div>⚡ Avg Latency: ${metrics.avgLatency.toFixed(2)}ms</div>
+                            <div>💾 Cache Hits: ${metrics.cacheHits}</div>
+                            <div>❌ Shard Failures: ${metrics.shardFailures}</div>
+                            <div>🎯 Cache Hit Rate: ${metrics.cacheStats.hitRate}%</div>
+                        </div>
+                    `;
+                    
+                    updateCharts(metrics);
+                }
+            } catch (error) {
+                metricsDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        function updateCharts(metrics) {
+            // Update latency chart
+            if (!latencyChart) {
+                const ctx = document.getElementById('latencyChart').getContext('2d');
+                latencyChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Shard 0', 'Shard 1', 'Shard 2', 'Shard 3', 'Shard 4', 'Shard 5', 'Shard 6', 'Shard 7', 'Shard 8', 'Shard 9'],
+                        datasets: [{
+                            label: 'Response Time (ms)',
+                            data: metrics.shardStatus.map(() => Math.random() * 100 + 50),
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true } },
+                        plugins: { legend: { labels: { color: 'white' } } }
+                    }
+                });
+            }
+            
+            // Update cache chart
+            if (!cacheChart) {
+                const ctx = document.getElementById('cacheChart').getContext('2d');
+                cacheChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Cache Hits', 'Cache Misses'],
+                        datasets: [{
+                            data: [metrics.cacheStats.hits, metrics.cacheStats.misses],
+                            backgroundColor: ['rgba(75, 192, 192, 0.8)', 'rgba(255, 99, 132, 0.8)']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { labels: { color: 'white' } } }
+                    }
+                });
+            }
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Initialize on page load
+        window.onload = () => {
+            checkShardStatus();
+            loadMetrics();
+        };
+    </script>
+</body>
+</html>
