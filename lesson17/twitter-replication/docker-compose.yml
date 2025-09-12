@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres-master:
+    image: postgres:16-alpine
+    container_name: postgres-master
+    environment:
+      POSTGRES_DB: twitter_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_REPLICATION_USER: replicator
+      POSTGRES_REPLICATION_PASSWORD: replicator_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - master_data:/var/lib/postgresql/data
+      - ./docker/master-init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/postgresql-master.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - twitter-net
+
+  postgres-slave1:
+    image: postgres:16-alpine
+    container_name: postgres-slave1
+    environment:
+      POSTGRES_DB: twitter_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - slave1_data:/var/lib/postgresql/data
+      - ./docker/master-init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - twitter-net
+
+  postgres-slave2:
+    image: postgres:16-alpine
+    container_name: postgres-slave2
+    environment:
+      POSTGRES_DB: twitter_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    volumes:
+      - slave2_data:/var/lib/postgresql/data
+      - ./docker/master-init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - twitter-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: twitter-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - twitter-net
+
+volumes:
+  master_data:
+  slave1_data:
+  slave2_data:
+
+networks:
+  twitter-net:
+    driver: bridge
