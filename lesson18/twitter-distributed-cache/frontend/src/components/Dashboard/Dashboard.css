@@ -1,0 +1,124 @@
+.dashboard-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0 24px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-content h1 {
+  margin: 0;
+  color: #1890ff;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.connection-status .ant-tag {
+  font-weight: bold;
+}
+
+.dashboard-content {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ant-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 12px 12px 0 0;
+}
+
+.ant-statistic-title {
+  color: #666;
+  font-size: 14px;
+}
+
+.ant-statistic-content {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.health-status {
+  padding: 16px 0;
+}
+
+.health-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 6px;
+}
+
+.health-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.health-details h4 {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.node-health {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 6px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.node-health span:first-child {
+  font-weight: 500;
+  margin-right: 8px;
+  min-width: 80px;
+}
+
+.node-health small {
+  margin-left: 8px;
+  color: #666;
+}
+
+.ant-table-small .ant-table-tbody > tr > td {
+  padding: 4px 8px;
+}
+
+.recharts-wrapper {
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 16px;
+  }
+  
+  .header-content {
+    padding: 0 16px;
+  }
+  
+  .header-content h1 {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  redis-shard-1:
+    image: redis:7.2-alpine
+    container_name: redis-shard-1
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-shard-1-data:/data
+    networks:
+      - cache-network
+
+  redis-shard-2:
+    image: redis:7.2-alpine
+    container_name: redis-shard-2
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-shard-2-data:/data
+    networks:
+      - cache-network
+
+  redis-shard-3:
+    image: redis:7.2-alpine
+    container_name: redis-shard-3
+    ports:
+      - "6381:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-shard-3-data:/data
+    networks:
+      - cache-network
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - cache-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+volumes:
+  redis-shard-1-data:
+  redis-shard-2-data:
+  redis-shard-3-data:
+  prometheus-data:
+
+networks:
+  cache-network:
+    driver: bridge
