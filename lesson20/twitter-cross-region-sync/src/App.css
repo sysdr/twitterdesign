@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.App {
+  text-align: center;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Custom loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Status indicators */
+.status-active {
+  @apply bg-green-500;
+}
+
+.status-degraded {
+  @apply bg-yellow-500;
+}
+
+.status-partitioned {
+  @apply bg-red-500;
+}
+
+.status-offline {
+  @apply bg-gray-500;
+}
+
+/* Event log styling */
+.event-log {
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}

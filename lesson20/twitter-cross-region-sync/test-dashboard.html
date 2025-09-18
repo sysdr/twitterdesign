@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Region Sync Dashboard - Test</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231DA1F2'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='Arial' font-size='16' font-weight='bold'>🔄</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts@2.7.2/dist/Recharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/umd/uuid.min.js"></script>
+    <script>
+        // Fallback UUID generator if CDN fails
+        if (typeof uuid === 'undefined') {
+            window.uuid = {
+                v4: function() {
+                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        var r = Math.random() * 16 | 0;
+                        var v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                }
+            };
+        }
+    </script>
+    <style>
+        .status-active { background-color: #10b981; }
+        .status-degraded { background-color: #f59e0b; }
+        .status-partitioned { background-color: #ef4444; }
+        .status-offline { background-color: #6b7280; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    Cross-Region Synchronization Dashboard
+                </h1>
+                <p class="text-gray-600">
+                    Monitor global data replication and conflict resolution across regions
+                </p>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+                <h3 class="text-lg font-semibold mb-4">Test Operations</h3>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="createTweet()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                        Create Tweet
+                    </button>
+                    <button onclick="simulateConflict()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
+                        Simulate Conflict
+                    </button>
+                    <button onclick="simulatePartition()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                        Simulate Partition
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Region Status -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Region Status</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border rounded p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-medium">US East</h4>
+                                <div class="w-3 h-3 rounded-full status-active" id="us-east-status"></div>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div>Location: Virginia</div>
+                                <div>Latency: <span id="us-east-latency">50</span>ms</div>
+                                <div>Conflict Rate: <span id="us-east-conflict">2.0</span>%</div>
+                                <div>Last Sync: <span id="us-east-sync">0</span>s ago</div>
+                            </div>
+                        </div>
+                        <div class="border rounded p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-medium">EU West</h4>
+                                <div class="w-3 h-3 rounded-full status-active" id="eu-west-status"></div>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div>Location: Ireland</div>
+                                <div>Latency: <span id="eu-west-latency">120</span>ms</div>
+                                <div>Conflict Rate: <span id="eu-west-conflict">1.0</span>%</div>
+                                <div>Last Sync: <span id="eu-west-sync">0</span>s ago</div>
+                            </div>
+                        </div>
+                        <div class="border rounded p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-medium">Asia Pacific</h4>
+                                <div class="w-3 h-3 rounded-full status-active" id="asia-pacific-status"></div>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div>Location: Tokyo</div>
+                                <div>Latency: <span id="asia-pacific-latency">200</span>ms</div>
+                                <div>Conflict Rate: <span id="asia-pacific-conflict">3.0</span>%</div>
+                                <div>Last Sync: <span id="asia-pacific-sync">0</span>s ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sync Metrics -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Synchronization Metrics</h3>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="total-events">0</div>
+                            <div class="text-sm text-gray-600">Total Events</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" id="replication-lag">0</div>
+                            <div class="text-sm text-gray-600">Replication Lag (ms)</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-yellow-600" id="conflicts-resolved">0</div>
+                            <div class="text-sm text-gray-600">Conflicts Resolved</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600" id="success-rate">0</div>
+                            <div class="text-sm text-gray-600">Success Rate (%)</div>
+                        </div>
+                    </div>
+
+                    <div class="h-64 bg-gray-50 rounded p-4">
+                        <canvas id="metrics-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Log -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Event Replication Log</h3>
+                <div class="space-y-2 max-h-64 overflow-y-auto" id="event-log">
+                    <div class="text-center text-gray-500 py-8">
+                        No replication events yet. Start creating some data!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let totalEvents = 0;
+        let conflictsResolved = 0;
+        let metricsData = [];
+        let eventLog = [];
+
+        // Initialize metrics chart
+        function initChart() {
+            const canvas = document.getElementById('metrics-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Simple chart drawing function
+            function drawChart() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                if (metricsData.length < 2) return;
+                
+                const padding = 40;
+                const chartWidth = canvas.width - 2 * padding;
+                const chartHeight = canvas.height - 2 * padding;
+                
+                // Draw axes
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, canvas.height - padding);
+                ctx.lineTo(canvas.width - padding, canvas.height - padding);
+                ctx.stroke();
+                
+                // Draw replication lag line
+                ctx.strokeStyle = '#8884d8';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                metricsData.forEach((point, index) => {
+                    const x = padding + (index / (metricsData.length - 1)) * chartWidth;
+                    const y = canvas.height - padding - (point.replicationLag / 500) * chartHeight;
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+            }
+            
+            // Update chart periodically
+            setInterval(() => {
+                updateMetrics();
+                drawChart();
+            }, 2000);
+        }
+
+        // Update metrics
+        function updateMetrics() {
+            const replicationLag = Math.floor(Math.random() * 500 + 100);
+            const successRate = (95 + Math.random() * 5).toFixed(1);
+            
+            metricsData.push({
+                timestamp: Date.now(),
+                replicationLag: replicationLag,
+                conflictsResolved: conflictsResolved
+            });
+            
+            // Keep only last 20 points
+            if (metricsData.length > 20) {
+                metricsData.shift();
+            }
+            
+            // Update UI
+            document.getElementById('total-events').textContent = totalEvents;
+            document.getElementById('replication-lag').textContent = replicationLag;
+            document.getElementById('conflicts-resolved').textContent = conflictsResolved;
+            document.getElementById('success-rate').textContent = successRate;
+            
+            // Update region sync times
+            updateRegionSyncTimes();
+        }
+
+        // Update region sync times
+        function updateRegionSyncTimes() {
+            const regions = ['us-east', 'eu-west', 'asia-pacific'];
+            regions.forEach(region => {
+                const syncTime = Math.floor(Math.random() * 5);
+                document.getElementById(`${region}-sync`).textContent = syncTime;
+            });
+        }
+
+        // Create tweet event
+        function createTweet() {
+            totalEvents++;
+            const event = {
+                id: (typeof uuid !== 'undefined' && uuid.v4) ? uuid.v4() : generateUUID(),
+                type: 'TWEET_CREATE',
+                content: `Sample tweet from US East at ${new Date().toLocaleTimeString()}`,
+                timestamp: Date.now(),
+                originRegion: 'us-east'
+            };
+            
+            addEventToLog(event);
+            updateMetrics();
+            
+            // Simulate replication delay
+            setTimeout(() => {
+                updateRegionSyncTimes();
+            }, 1000);
+        }
+
+        // Generate UUID fallback function
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0;
+                var v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Simulate conflict
+        function simulateConflict() {
+            totalEvents += 2;
+            conflictsResolved++;
+            
+            const event1 = {
+                id: (typeof uuid !== 'undefined' && uuid.v4) ? uuid.v4() : generateUUID(),
+                type: 'TWEET_UPDATE',
+                content: 'Updated from US',
+                timestamp: Date.now(),
+                originRegion: 'us-east'
+            };
+            
+            const event2 = {
+                id: (typeof uuid !== 'undefined' && uuid.v4) ? uuid.v4() : generateUUID(),
+                type: 'TWEET_UPDATE',
+                content: 'Updated from EU',
+                timestamp: Date.now() + 100,
+                originRegion: 'eu-west'
+            };
+            
+            addEventToLog(event1);
+            addEventToLog(event2);
+            
+            // Show conflict resolution
+            setTimeout(() => {
+                const resolutionEvent = {
+                    id: (typeof uuid !== 'undefined' && uuid.v4) ? uuid.v4() : generateUUID(),
+                    type: 'CONFLICT_RESOLVED',
+                    content: 'Conflict resolved using Last Writer Wins strategy',
+                    timestamp: Date.now(),
+                    originRegion: 'system'
+                };
+                addEventToLog(resolutionEvent);
+                updateMetrics();
+            }, 2000);
+        }
+
+        // Simulate network partition
+        function simulatePartition() {
+            const region = 'eu-west';
+            const statusElement = document.getElementById(`${region}-status`);
+            
+            // Set to partitioned
+            statusElement.className = 'w-3 h-3 rounded-full status-partitioned';
+            
+            // Show partition event
+            const partitionEvent = {
+                id: (typeof uuid !== 'undefined' && uuid.v4) ? uuid.v4() : generateUUID(),
+                type: 'NETWORK_PARTITION',
+                content: `Network partition detected for ${region.toUpperCase()}`,
+                timestamp: Date.now(),
+                originRegion: 'system'
+            };
+            addEventToLog(partitionEvent);
+            
+            // Recover after 5 seconds
+            setTimeout(() => {
+                statusElement.className = 'w-3 h-3 rounded-full status-active';
+                
+                const recoveryEvent = {
+                    id: (typeof uuid !== 'undefined' && uuid.v4) ? uuid.v4() : generateUUID(),
+                    type: 'PARTITION_RECOVERED',
+                    content: `Network partition recovered for ${region.toUpperCase()}`,
+                    timestamp: Date.now(),
+                    originRegion: 'system'
+                };
+                addEventToLog(recoveryEvent);
+                updateMetrics();
+            }, 5000);
+        }
+
+        // Add event to log
+        function addEventToLog(event) {
+            eventLog.unshift(event);
+            
+            // Keep only last 10 events
+            if (eventLog.length > 10) {
+                eventLog.pop();
+            }
+            
+            updateEventLogDisplay();
+        }
+
+        // Update event log display
+        function updateEventLogDisplay() {
+            const logContainer = document.getElementById('event-log');
+            
+            if (eventLog.length === 0) {
+                logContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No replication events yet. Start creating some data!</div>';
+                return;
+            }
+            
+            logContainer.innerHTML = eventLog.map(event => {
+                const typeColor = getEventTypeColor(event.type);
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <div class="flex items-center space-x-3">
+                            <span class="px-2 py-1 rounded text-xs font-medium ${typeColor}">
+                                ${event.type}
+                            </span>
+                            <span class="text-sm font-mono">${event.id.substring(0, 8)}...</span>
+                            <span class="text-sm text-gray-600">from ${event.originRegion}</span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            ${new Date(event.timestamp).toLocaleTimeString()}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Get event type color
+        function getEventTypeColor(type) {
+            switch (type) {
+                case 'TWEET_CREATE': return 'bg-blue-100 text-blue-800';
+                case 'TWEET_UPDATE': return 'bg-yellow-100 text-yellow-800';
+                case 'CONFLICT_RESOLVED': return 'bg-green-100 text-green-800';
+                case 'NETWORK_PARTITION': return 'bg-red-100 text-red-800';
+                case 'PARTITION_RECOVERED': return 'bg-green-100 text-green-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Initialize the dashboard
+        function init() {
+            initChart();
+            updateMetrics();
+            
+            // Update metrics every 5 seconds
+            setInterval(updateMetrics, 5000);
+            
+            // Update region sync times every 2 seconds
+            setInterval(updateRegionSyncTimes, 2000);
+        }
+
+        // Start the dashboard
+        init();
+    </script>
+</body>
+</html>

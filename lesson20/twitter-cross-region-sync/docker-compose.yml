@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  cross-region-sync:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    
+  # Redis for session storage (future lesson)
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+networks:
+  default:
+    name: twitter-cross-region-network

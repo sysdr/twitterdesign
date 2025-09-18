@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'cross-region-sync'
+    static_configs:
+      - targets: ['cross-region-sync:80']
+    scrape_interval: 5s
+    metrics_path: /metrics
