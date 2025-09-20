@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  redis-node1:
+    image: redis:7-alpine
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - ./redis-cluster/node-1/redis.conf:/etc/redis/redis.conf
+      - redis1-data:/data
+    ports:
+      - "7000:7000"
+    networks:
+      - twitter-network
+
+  redis-node2:
+    image: redis:7-alpine
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - ./redis-cluster/node-2/redis.conf:/etc/redis/redis.conf
+      - redis2-data:/data
+    ports:
+      - "7001:7001"
+    networks:
+      - twitter-network
+
+  redis-node3:
+    image: redis:7-alpine
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - ./redis-cluster/node-3/redis.conf:/etc/redis/redis.conf
+      - redis3-data:/data
+    ports:
+      - "7002:7002"
+    networks:
+      - twitter-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      - REDIS_CLUSTER_NODES=redis-node1:7000,redis-node2:7001,redis-node3:7002
+      - NODE_ENV=production
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+    networks:
+      - twitter-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - twitter-network
+
+volumes:
+  redis1-data:
+  redis2-data:
+  redis3-data:
+
+networks:
+  twitter-network:
+    driver: bridge
