@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  load-testing-dashboard:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - twitter-network
+
+networks:
+  twitter-network:
+    driver: bridge

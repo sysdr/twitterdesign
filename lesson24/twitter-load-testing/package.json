@@ -1,0 +1,35 @@
+{
+  "name": "twitter-load-testing",
+  "version": "1.0.0",
+  "description": "Multi-Region Load Testing for Twitter Clone",
+  "main": "src/index.tsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "jest",
+    "test:load": "npm run build && node dist/load-test.js",
+    "docker:build": "docker build -t twitter-load-testing .",
+    "docker:run": "docker run -p 3000:3000 twitter-load-testing"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.6.0",
+    "ws": "^8.14.0",
+    "recharts": "^2.8.0",
+    "uuid": "^9.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "@types/ws": "^8.5.0",
+    "@types/uuid": "^9.0.0",
+    "ts-jest": "^29.0.0"
+  }
+}
