@@ -1,5 +1,6 @@
 # Hands-On Twitter System Design
 
+Substack Article Link : https://twitterdesign.substack.com/
 ## Course Details
 
 ## Build Production-Ready Social Media Architecture From Scratch
