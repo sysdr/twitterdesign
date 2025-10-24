@@ -1,0 +1,45 @@
+{
+  "name": "content-moderation-backend",
+  "version": "1.0.0",
+  "description": "Twitter-scale content moderation backend",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "jest",
+    "test:integration": "jest --config jest.integration.config.js"
+  },
+  "dependencies": {
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.6.8",
+    "bcrypt": "^5.1.1",
+    "bull": "^4.16.5",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "joi": "^17.12.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.16.3",
+    "redis": "^4.7.1",
+    "sharp": "^0.33.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.12.7",
+    "@types/pg": "^8.11.5",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}
