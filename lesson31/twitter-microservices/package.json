@@ -1,0 +1,26 @@
+{
+  "name": "twitter-microservices",
+  "version": "1.0.0",
+  "description": "Production-ready Twitter microservices architecture",
+  "scripts": {
+    "install:all": "npm run install:gateway && npm run install:services && npm run install:frontend",
+    "install:gateway": "cd api-gateway && npm install",
+    "install:services": "cd services/user-service && npm install && cd ../tweet-service && npm install && cd ../timeline-service && npm install && cd ../media-service && npm install && cd ../notification-service && npm install && cd ../analytics-service && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "build:all": "npm run build:services && npm run build:gateway && npm run build:frontend",
+    "build:services": "cd services/user-service && npm run build && cd ../tweet-service && npm run build && cd ../timeline-service && npm run build && cd ../media-service && npm run build && cd ../notification-service && npm run build && cd ../analytics-service && npm run build",
+    "build:gateway": "cd api-gateway && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "dev": "concurrently \"npm run dev:services\" \"npm run dev:gateway\" \"npm run dev:frontend\"",
+    "dev:consul": "consul agent -dev -ui -client=0.0.0.0 -port=8500",
+    "dev:services": "concurrently \"cd services/user-service && npm run dev\" \"cd services/tweet-service && npm run dev\" \"cd services/timeline-service && npm run dev\" \"cd services/media-service && npm run dev\" \"cd services/notification-service && npm run dev\" \"cd services/analytics-service && npm run dev\"",
+    "dev:gateway": "cd api-gateway && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "test:all": "npm run test:services && npm run test:gateway",
+    "test:services": "cd services/user-service && npm test && cd ../tweet-service && npm test && cd ../timeline-service && npm test && cd ../media-service && npm test && cd ../notification-service && npm test && cd ../analytics-service && npm test",
+    "test:gateway": "cd api-gateway && npm test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

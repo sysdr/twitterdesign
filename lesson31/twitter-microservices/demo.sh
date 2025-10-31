@@ -1,0 +1,45 @@
+#!/bin/bash
+
+echo "🎬 Twitter Microservices Demo"
+echo "==============================="
+
+echo ""
+echo "🏗️  Architecture Overview:"
+echo "- 6 independent microservices"
+echo "- API Gateway with intelligent routing"
+echo "- Service discovery with Consul"
+echo "- Real-time health monitoring"
+echo "- Independent scaling capabilities"
+
+echo ""
+echo "🌐 Access Points:"
+echo "- Dashboard: http://localhost:3001"
+echo "- API Gateway: http://localhost:3000"
+echo "- Service Monitor: http://localhost:3001/monitor"
+echo "- Consul UI: http://localhost:8500"
+
+echo ""
+echo "🔧 Available APIs:"
+echo "- POST /api/auth/register - User registration"
+echo "- POST /api/auth/login - User authentication"
+echo "- GET /api/users/profile/:id - Get user profile"
+echo "- POST /api/tweets - Create new tweet"
+echo "- GET /api/tweets/:id - Get tweet by ID"
+
+echo ""
+echo "📊 Real-time Features:"
+echo "- Service health monitoring"
+echo "- Load balancing across instances"
+echo "- Circuit breaker patterns"
+echo "- Request tracing and logging"
+
+echo ""
+echo "🚀 Production Ready:"
+echo "- JWT authentication"
+echo "- Rate limiting"
+echo "- CORS configuration"
+echo "- Error handling"
+echo "- Monitoring and alerting"
+
+echo ""
+echo "Open your browser to http://localhost:3001 to see the system in action!"

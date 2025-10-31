@@ -1,0 +1,15 @@
+.service-card {
+  @apply bg-white rounded-lg shadow-md p-6 border border-gray-200;
+}
+
+.service-healthy {
+  @apply border-green-300 bg-green-50;
+}
+
+.service-unhealthy {
+  @apply border-red-300 bg-red-50;
+}
+
+.metric-card {
+  @apply bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-4;
+}
