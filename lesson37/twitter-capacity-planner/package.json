@@ -1,0 +1,30 @@
+{
+  "name": "twitter-capacity-planner",
+  "version": "1.0.0",
+  "description": "Mathematical capacity planning using queuing theory",
+  "main": "index.tsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "lucide-react": "^0.446.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^24.1.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.6",
+    "vitest": "^2.1.1",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/jest-dom": "^6.5.0"
+  }
+}
