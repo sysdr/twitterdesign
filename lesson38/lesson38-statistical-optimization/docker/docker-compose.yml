@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  optimizer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ../src:/app/src
+      - ../package.json:/app/package.json
+    environment:
+      - NODE_ENV=development
+    command: npm run dev

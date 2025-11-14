@@ -1,0 +1,41 @@
+{
+  "name": "statistical-performance-optimizer",
+  "version": "1.0.0",
+  "description": "Automated performance optimization using Bayesian methods and A/B testing",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "tsx src/api/server.ts",
+    "client": "vite",
+    "build": "tsc && vite build",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "mathjs": "^12.4.1",
+    "jstat": "^1.9.6",
+    "uuid": "^9.0.1",
+    "recharts": "^2.12.2",
+    "lucide-react": "^0.400.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.12.7",
+    "@types/jest": "^29.5.12",
+    "@types/uuid": "^9.0.7",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "concurrently": "^8.2.2"
+  }
+}
