@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Cache Optimization Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #1a202c;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #718096;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #a0aec0;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            color: #1a202c;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 20px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: height 0.3s ease;
+            min-height: 20px;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #718096;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #1a202c;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1em;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status.good {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status.warning {
+            background: #fef5e7;
+            color: #9c4221;
+        }
+
+        .status.excellent {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-item {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-item .label {
+            color: #718096;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .metric-item .value {
+            color: #1a202c;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Twitter Cache Optimization Dashboard</h1>
+            <p>Real-time monitoring of LRU-K, ARC, and Predictive Warming algorithms</p>
+        </div>
+
+        <div class="controls">
+            <h3 style="margin-bottom: 15px; color: #1a202c;">Test Cache Performance</h3>
+            <div class="button-group">
+                <button onclick="testOneHitWonders()">Test One-Hit Wonders</button>
+                <button onclick="testFrequentAccess()">Test Frequent Access</button>
+                <button onclick="testARCAdaptation()">Test ARC Adaptation</button>
+                <button onclick="testPredictiveWarming()">Test Predictive Warming</button>
+                <button onclick="resetCache()">Reset Cache</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Overall Hit Rate</h3>
+                <div class="stat-value" id="hitRate">--</div>
+                <div class="stat-label">Cache efficiency</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="hitRateBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Average Latency</h3>
+                <div class="stat-value" id="avgLatency">--</div>
+                <div class="stat-label">Response time</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Cache Hits</h3>
+                <div class="stat-value" id="cacheHits">--</div>
+                <div class="stat-label">Successful retrievals</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>DB Queries Saved</h3>
+                <div class="stat-value" id="queriesSaved">--</div>
+                <div class="stat-label">Performance improvement</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2 class="chart-title">Cache Layer Performance</h2>
+            <div class="bar-chart" id="cacheChart">
+                <div class="bar" id="l1Bar">
+                    <div class="bar-value" id="l1Value">0%</div>
+                    <div class="bar-label">L1 (LRU-K)</div>
+                </div>
+                <div class="bar" id="l2Bar">
+                    <div class="bar-value" id="l2Value">0%</div>
+                    <div class="bar-label">L2 (ARC)</div>
+                </div>
+                <div class="bar" id="dbBar">
+                    <div class="bar-value" id="dbValue">0%</div>
+                    <div class="bar-label">Database</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2 class="chart-title">Detailed Metrics</h2>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="label">L1 Cache Size</div>
+                    <div class="value" id="l1Size">--</div>
+                </div>
+                <div class="metric-item">
+                    <div class="label">L2 Cache Size</div>
+                    <div class="value" id="l2Size">--</div>
+                </div>
+                <div class="metric-item">
+                    <div class="label">ARC Adaptations</div>
+                    <div class="value" id="arcAdaptations">--</div>
+                </div>
+                <div class="metric-item">
+                    <div class="label">Patterns Learned</div>
+                    <div class="value" id="patternsLearned">--</div>
+                </div>
+                <div class="metric-item">
+                    <div class="label">Prediction Accuracy</div>
+                    <div class="value" id="predictionAccuracy">--</div>
+                </div>
+                <div class="metric-item">
+                    <div class="label">Working Set Size</div>
+                    <div class="value" id="workingSetSize">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE}/cache/stats`);
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Overall metrics
+            const hitRate = parseFloat(data.performance.overallHitRate);
+            document.getElementById('hitRate').textContent = hitRate.toFixed(1) + '%';
+            document.getElementById('hitRateBar').style.width = hitRate + '%';
+            
+            document.getElementById('avgLatency').textContent = data.performance.averageLatency;
+            
+            const totalHits = data.cache.l1.hits + data.cache.l2.hits;
+            document.getElementById('cacheHits').textContent = totalHits;
+            
+            const queriesSaved = totalHits;
+            document.getElementById('queriesSaved').textContent = queriesSaved;
+
+            // Cache layer chart
+            const l1Rate = data.cache.l1.hitRate;
+            const l2Rate = data.cache.l2.hitRate;
+            const dbRate = 100 - hitRate;
+
+            document.getElementById('l1Bar').style.height = l1Rate + '%';
+            document.getElementById('l1Value').textContent = l1Rate.toFixed(1) + '%';
+            
+            document.getElementById('l2Bar').style.height = l2Rate + '%';
+            document.getElementById('l2Value').textContent = l2Rate.toFixed(1) + '%';
+            
+            document.getElementById('dbBar').style.height = dbRate + '%';
+            document.getElementById('dbValue').textContent = dbRate.toFixed(1) + '%';
+
+            // Detailed metrics
+            document.getElementById('l1Size').textContent = data.cache.l1.size;
+            document.getElementById('l2Size').textContent = data.cache.l2.t1Size + data.cache.l2.t2Size;
+            document.getElementById('arcAdaptations').textContent = data.cache.l2.adaptations;
+            document.getElementById('patternsLearned').textContent = data.cache.predictive.patternsLearned;
+            document.getElementById('predictionAccuracy').textContent = 
+                data.cache.predictive.accuracy.toFixed(1) + '%';
+            document.getElementById('workingSetSize').textContent = 
+                data.cache.workingSet.currentWorkingSetSize;
+        }
+
+        async function testOneHitWonders() {
+            console.log('Testing one-hit wonders...');
+            for (let i = 1; i <= 30; i++) {
+                await fetch(`${API_BASE}/tweets/tweet_${i}`);
+            }
+            await fetchStats();
+        }
+
+        async function testFrequentAccess() {
+            console.log('Testing frequent access...');
+            const tweets = ['tweet_100', 'tweet_101', 'tweet_102'];
+            for (let i = 0; i < 10; i++) {
+                for (const id of tweets) {
+                    await fetch(`${API_BASE}/tweets/${id}`);
+                }
+            }
+            await fetchStats();
+        }
+
+        async function testARCAdaptation() {
+            console.log('Testing ARC adaptation...');
+            // Recency pattern
+            for (let i = 200; i < 220; i++) {
+                await fetch(`${API_BASE}/tweets/tweet_${i}`);
+            }
+            // Frequency pattern
+            const frequent = ['tweet_300', 'tweet_301'];
+            for (let i = 0; i < 15; i++) {
+                for (const id of frequent) {
+                    await fetch(`${API_BASE}/tweets/${id}`);
+                }
+            }
+            await fetchStats();
+        }
+
+        async function testPredictiveWarming() {
+            console.log('Testing predictive warming...');
+            const patterns = [
+                ['tweet_500', 'tweet_501', 'tweet_502'],
+                ['tweet_500', 'tweet_501', 'tweet_502'],
+                ['tweet_500', 'tweet_501', 'tweet_502']
+            ];
+            
+            for (const pattern of patterns) {
+                for (const id of pattern) {
+                    await fetch(`${API_BASE}/tweets/${id}`);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            }
+            await fetchStats();
+        }
+
+        async function resetCache() {
+            await fetch(`${API_BASE}/cache/reset`, { method: 'POST' });
+            await fetchStats();
+        }
+
+        // Initial load and periodic updates
+        fetchStats();
+        setInterval(fetchStats, 2000);
+    </script>
+</body>
+</html>
+

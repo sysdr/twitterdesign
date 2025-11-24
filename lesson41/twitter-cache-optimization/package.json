@@ -1,0 +1,37 @@
+{
+  "name": "twitter-cache-optimization",
+  "version": "1.0.0",
+  "description": "Mathematical cache optimization with LRU-K, ARC, and predictive warming",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "demo": "ts-node src/demo.ts"
+  },
+  "keywords": ["cache", "lru-k", "arc", "optimization", "twitter"],
+  "author": "System Design Course",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "ioredis": "^5.4.1",
+    "uuid": "^9.0.1",
+    "prom-client": "^15.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.12.12",
+    "@types/uuid": "^9.0.8",
+    "@types/jest": "^29.5.12",
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.4"
+  }
+}
+
