@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Failure Probability Analysis System</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .header h1 {
+      color: #1a202c;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      color: #718096;
+      font-size: 14px;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    
+    .metric-value {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .metric-label {
+      font-size: 14px;
+      color: #718096;
+    }
+    
+    .risk-low { color: #48bb78; }
+    .risk-medium { color: #ed8936; }
+    .risk-high { color: #f56565; }
+    .risk-critical { 
+      color: #c53030;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .recommendations {
+      list-style: none;
+    }
+    
+    .recommendations li {
+      padding: 12px;
+      background: #f7fafc;
+      border-left: 4px solid #4299e1;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .controls {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .slider-container {
+      margin: 20px 0;
+    }
+    
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4299e1;
+      cursor: pointer;
+    }
+    
+    .button {
+      background: #4299e1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    
+    .button:hover {
+      background: #3182ce;
+    }
+    
+    .chart-container {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .status-online { background: #48bb78; }
+    .status-warning { background: #ed8936; }
+    .status-critical { background: #f56565; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    
+    function Dashboard() {
+      const [metrics, setMetrics] = useState([]);
+      const [prediction, setPrediction] = useState(null);
+      const [systemLoad, setSystemLoad] = useState(20);
+      const [connected, setConnected] = useState(false);
+      const [currentMetrics, setCurrentMetrics] = useState(null);
+      const metricsChartRef = React.useRef(null);
+      const probabilityChartRef = React.useRef(null);
+      const metricsChartInstance = React.useRef(null);
+      const probabilityChartInstance = React.useRef(null);
+      
+      // Fetch initial data
+      useEffect(() => {
+        const fetchCurrentData = async () => {
+          try {
+            const response = await fetch('/api/current-prediction');
+            const data = await response.json();
+            if (data.currentMetrics) {
+              setCurrentMetrics(data.currentMetrics);
+            }
+            if (data.prediction && !prediction) {
+              setPrediction({ prediction: data.prediction, analysis: data.analysis, redundancy: data.redundancy });
+            }
+          } catch (error) {
+            console.error('Error fetching current data:', error);
+          }
+        };
+        fetchCurrentData();
+        const interval = setInterval(fetchCurrentData, 2000);
+        return () => clearInterval(interval);
+      }, []);
+      
+      useEffect(() => {
+        // WebSocket connection
+        const ws = new WebSocket(`ws://${window.location.host}`);
+        
+        ws.onopen = () => {
+          setConnected(true);
+          console.log('Connected to failure prediction system');
+        };
+        
+        ws.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          
+          if (message.type === 'metric') {
+            setMetrics(prev => {
+              const updated = [...prev, message.data].slice(-100);
+              return updated;
+            });
+            setCurrentMetrics(message.data);
+          } else if (message.type === 'prediction') {
+            setPrediction(message.data);
+          }
+        };
+        
+        ws.onclose = () => {
+          setConnected(false);
+          console.log('Disconnected from server');
+        };
+        
+        return () => ws.close();
+      }, []);
+      
+      const handleLoadChange = async (newLoad) => {
+        setSystemLoad(newLoad);
+        await fetch('/api/simulate-load', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ load: newLoad })
+        });
+      };
+      
+      const handleInjectError = async () => {
+        await fetch('/api/inject-error', { method: 'POST' });
+      };
+      
+      const getRiskColor = (level) => {
+        const colors = {
+          low: '#48bb78',
+          medium: '#ed8936',
+          high: '#f56565',
+          critical: '#c53030'
+        };
+        return colors[level] || '#718096';
+      };
+      
+      const formatProbability = (prob) => {
+        return (prob * 100).toFixed(2) + '%';
+      };
+      
+      const chartData = metrics.map(m => ({
+        time: new Date(m.timestamp).toLocaleTimeString(),
+        cpu: parseFloat(m.cpuUsage.toFixed(1)),
+        memory: parseFloat(m.memoryUsage.toFixed(1)),
+        errorRate: parseFloat((m.errorRate * 100).toFixed(3)),
+        failProb: prediction ? parseFloat((prediction.prediction.probability1Hour * 100).toFixed(2)) : 0
+      }));
+      
+      // Initialize and update Chart.js charts
+      useEffect(() => {
+        if (chartData.length === 0 || !window.Chart) return;
+        
+        // Metrics chart
+        if (metricsChartRef.current) {
+          const ctx = metricsChartRef.current.getContext('2d');
+          if (metricsChartInstance.current) {
+            metricsChartInstance.current.destroy();
+          }
+          metricsChartInstance.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: chartData.map(d => d.time),
+              datasets: [
+                {
+                  label: 'CPU %',
+                  data: chartData.map(d => d.cpu),
+                  borderColor: '#4299e1',
+                  backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                  tension: 0.4
+                },
+                {
+                  label: 'Memory %',
+                  data: chartData.map(d => d.memory),
+                  borderColor: '#ed8936',
+                  backgroundColor: 'rgba(237, 137, 54, 0.1)',
+                  tension: 0.4
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true }
+              },
+              scales: {
+                y: { beginAtZero: true, max: 100 }
+              }
+            }
+          });
+        }
+        
+        // Probability chart
+        if (probabilityChartRef.current) {
+          const ctx = probabilityChartRef.current.getContext('2d');
+          if (probabilityChartInstance.current) {
+            probabilityChartInstance.current.destroy();
+          }
+          probabilityChartInstance.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: chartData.map(d => d.time),
+              datasets: [{
+                label: 'Failure Probability %',
+                data: chartData.map(d => d.failProb),
+                borderColor: '#f56565',
+                backgroundColor: 'rgba(245, 101, 101, 0.2)',
+                fill: true,
+                tension: 0.4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true }
+              },
+              scales: {
+                y: { beginAtZero: true, max: 100 }
+              }
+            }
+          });
+        }
+        
+        return () => {
+          if (metricsChartInstance.current) metricsChartInstance.current.destroy();
+          if (probabilityChartInstance.current) probabilityChartInstance.current.destroy();
+        };
+      }, [chartData]);
+      
+      return (
+        <div className="container">
+          <div className="header">
+            <h1>
+              <span className={`status-indicator ${connected ? 'status-online' : 'status-critical'}`}></span>
+              Failure Probability Analysis System
+            </h1>
+            <p>Real-time reliability prediction with 95%+ accuracy • Predicting failures 30+ minutes in advance</p>
+          </div>
+          
+          <div className="controls card">
+            <h3 className="card-title">System Controls</h3>
+            <div className="slider-container">
+              <label>Simulated Load: {systemLoad}%</label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={systemLoad}
+                onChange={(e) => handleLoadChange(parseInt(e.target.value))}
+                className="slider"
+              />
+            </div>
+            <button className="button" onClick={handleInjectError}>
+              Inject Error
+            </button>
+            <button className="button" onClick={() => window.location.reload()}>
+              Reset System
+            </button>
+          </div>
+          
+          {currentMetrics && (
+            <div className="grid">
+              <div className="card">
+                <div className="card-title">CPU Usage</div>
+                <div className="metric-value" style={{color: currentMetrics.cpuUsage > 80 ? '#f56565' : '#4299e1'}}>
+                  {currentMetrics.cpuUsage.toFixed(1)}%
+                </div>
+                <div className="metric-label">Current CPU utilization</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Memory Usage</div>
+                <div className="metric-value" style={{color: currentMetrics.memoryUsage > 85 ? '#f56565' : '#ed8936'}}>
+                  {currentMetrics.memoryUsage.toFixed(1)}%
+                </div>
+                <div className="metric-label">Growth Rate: {currentMetrics.memoryGrowthRate.toFixed(3)}%</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Response Time</div>
+                <div className="metric-value" style={{color: '#667eea'}}>
+                  {currentMetrics.responseTime.toFixed(1)}ms
+                </div>
+                <div className="metric-label">Variance: {currentMetrics.responseTimeVariance.toFixed(1)}</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Error Rate</div>
+                <div className="metric-value" style={{color: currentMetrics.errorRate > 0.01 ? '#f56565' : '#48bb78'}}>
+                  {(currentMetrics.errorRate * 100).toFixed(3)}%
+                </div>
+                <div className="metric-label">Current error frequency</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Active Connections</div>
+                <div className="metric-value" style={{color: '#38b2ac'}}>
+                  {currentMetrics.activeConnections}
+                </div>
+                <div className="metric-label">Current open connections</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Queue Depth</div>
+                <div className="metric-value" style={{color: currentMetrics.queueDepth > 30 ? '#f56565' : '#805ad5'}}>
+                  {currentMetrics.queueDepth}
+                </div>
+                <div className="metric-label">Pending requests in queue</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Disk I/O Wait</div>
+                <div className="metric-value" style={{color: '#9f7aea'}}>
+                  {currentMetrics.diskIOWait.toFixed(1)}ms
+                </div>
+                <div className="metric-label">I/O wait time</div>
+              </div>
+              
+              <div className="card">
+                <div className="card-title">Network Latency</div>
+                <div className="metric-value" style={{color: '#f6ad55'}}>
+                  {currentMetrics.networkLatency.toFixed(1)}ms
+                </div>
+                <div className="metric-label">Current network delay</div>
+              </div>
+            </div>
+          )}
+          
+          {prediction && (
+            <>
+              <div className="grid">
+                <div className="card">
+                  <div className="card-title">Failure Probability (1 Hour)</div>
+                  <div className={`metric-value risk-${prediction.prediction.riskLevel}`}>
+                    {formatProbability(prediction.prediction.probability1Hour)}
+                  </div>
+                  <div className="metric-label">
+                    Risk Level: <strong>{prediction.prediction.riskLevel.toUpperCase()}</strong>
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="card-title">Time to Failure</div>
+                  <div className="metric-value" style={{color: '#4299e1'}}>
+                    {prediction.prediction.timeToFailure.toFixed(1)}h
+                  </div>
+                  <div className="metric-label">
+                    Estimated time until system failure
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="card-title">Prediction Confidence</div>
+                  <div className="metric-value" style={{color: '#805ad5'}}>
+                    {(prediction.prediction.confidence * 100).toFixed(1)}%
+                  </div>
+                  <div className="metric-label">
+                    Model accuracy: {prediction.prediction.confidence > 0.9 ? 'High' : 'Building...'}
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="card-title">Failure Rate Trend</div>
+                  <div className="metric-value" style={{color: '#ed8936'}}>
+                    {prediction.analysis.trend.toUpperCase()}
+                  </div>
+                  <div className="metric-label">
+                    λ = {prediction.analysis.currentFailureRate.toFixed(4)}/hour
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid">
+                <div className="card">
+                  <div className="card-title">Active Instances</div>
+                  <div className="metric-value" style={{color: '#38b2ac'}}>
+                    {prediction.redundancy.activeInstances}
+                  </div>
+                  <div className="metric-label">
+                    Standby: {prediction.redundancy.standbyInstances}
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="card-title">Circuit Breaker</div>
+                  <div className="metric-value" style={{color: prediction.redundancy.circuitBreakerEnabled ? '#f56565' : '#48bb78'}}>
+                    {prediction.redundancy.circuitBreakerEnabled ? 'ENABLED' : 'DISABLED'}
+                  </div>
+                  <div className="metric-label">
+                    Strategy: {prediction.redundancy.loadBalancingStrategy}
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="card-title">6-Hour Probability</div>
+                  <div className="metric-value" style={{color: '#667eea'}}>
+                    {formatProbability(prediction.prediction.probability6Hour)}
+                  </div>
+                  <div className="metric-label">
+                    24h: {formatProbability(prediction.prediction.probability24Hour)}
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="card-title">Distribution Model</div>
+                  <div className="metric-value" style={{color: '#9f7aea', fontSize: '24px'}}>
+                    {prediction.analysis.distribution.type.toUpperCase()}
+                  </div>
+                  <div className="metric-label">
+                    AIC: {prediction.analysis.distribution.aic.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="card">
+                <h3 className="card-title">Recommended Actions</h3>
+                <ul className="recommendations">
+                  {prediction.prediction.recommendations.map((rec, idx) => (
+                    <li key={idx}>{rec}</li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          )}
+          
+          {chartData.length > 0 && (
+            <>
+              <div className="chart-container">
+                <h3 className="card-title">System Metrics Over Time</h3>
+                <div style={{height: '300px', position: 'relative'}}>
+                  <canvas ref={metricsChartRef}></canvas>
+                </div>
+              </div>
+              
+              <div className="chart-container">
+                <h3 className="card-title">Failure Probability Tracking</h3>
+                <div style={{height: '300px', position: 'relative'}}>
+                  <canvas ref={probabilityChartRef}></canvas>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+    
+    ReactDOM.render(<Dashboard />, document.getElementById('root'));
+  </script>
+</body>
+</html>
