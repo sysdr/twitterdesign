@@ -1,0 +1,38 @@
+{
+  "name": "cost-optimization-system",
+  "version": "1.0.0",
+  "description": "Automated cost optimization for distributed systems",
+  "main": "src/index.tsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "jest --coverage",
+    "start": "node server/index.js",
+    "demo": "node scripts/demo.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "date-fns": "^3.6.0",
+    "express": "^4.19.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "simple-statistics": "^7.8.3",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/react": "^15.0.7",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/ws": "^8.5.10",
+    "@vitejs/plugin-react": "^4.3.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "ts-jest": "^29.1.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12"
+  }
+}

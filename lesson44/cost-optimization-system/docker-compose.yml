@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  cost-optimizer:
+    build: .
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./src:/app/src
