@@ -1,0 +1,43 @@
+# Node
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.parcel-cache
+.eslintcache
+.cache
+dist
+
+# TypeScript/Vite
+*.tsbuildinfo
+.vite
+
+# Backend build
+backend/dist
+
+# Frontend build
+frontend/dist
+
+# Logs
+logs
+*.log
+*.log.*
+/tmp
+
+# Env
+.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache
+.venv
+venv
+
+# IDE
+.idea
+.vscode
+*.swp
+
