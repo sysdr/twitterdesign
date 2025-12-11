@@ -1,0 +1,43 @@
+{
+  "name": "twitter-observability-stack",
+  "version": "1.0.0",
+  "description": "Advanced Monitoring and Observability for Twitter Clone",
+  "scripts": {
+    "build": "tsc && npm run copy-dashboard",
+    "copy-dashboard": "mkdir -p dist/dashboard/public && cp -r src/dashboard/public/. dist/dashboard/public/ 2>/dev/null || cp -r src/dashboard/public/* dist/dashboard/public/",
+    "start": "node dist/index.js",
+    "start:dashboard": "node dist/dashboard/index.js",
+    "dev": "ts-node src/index.ts",
+    "dev:dashboard": "ts-node src/dashboard/index.ts",
+    "test": "jest",
+    "demo": "ts-node src/demo.ts"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.52.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.47.1",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.52.1",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.52.1",
+    "@opentelemetry/instrumentation-express": "^0.41.1",
+    "@opentelemetry/instrumentation-http": "^0.52.1",
+    "@opentelemetry/resources": "^1.25.1",
+    "@opentelemetry/semantic-conventions": "^1.25.1",
+    "express": "^4.19.2",
+    "prom-client": "^15.1.2",
+    "axios": "^1.7.2",
+    "ioredis": "^5.4.1",
+    "@tensorflow/tfjs-node": "^4.20.0",
+    "winston": "^3.13.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.4"
+  }
+}

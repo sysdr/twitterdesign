@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observability Stack Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 Observability Stack Dashboard</h1>
+                <p class="subtitle">Advanced Monitoring & Observability for Twitter Clone</p>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Checking...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Overview Cards -->
+        <section class="overview-section">
+            <div class="card">
+                <div class="card-icon">🔍</div>
+                <div class="card-content">
+                    <h3>Distributed Tracing</h3>
+                    <p>OpenTelemetry + Jaeger</p>
+                    <div class="card-status" id="tracingStatus">Active</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                    <h3>SLI/SLO Monitoring</h3>
+                    <p>Service Level Indicators</p>
+                    <div class="card-status" id="sloStatus">Monitoring</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤖</div>
+                <div class="card-content">
+                    <h3>ML Predictions</h3>
+                    <p>LSTM-based Alerting</p>
+                    <div class="card-status" id="mlStatus">Active</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <h3>Metrics Collection</h3>
+                    <p>Prometheus Metrics</p>
+                    <div class="card-status" id="metricsStatus">Collecting</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLO Status Section -->
+        <section class="section">
+            <h2>Service Level Objectives (SLO) Status</h2>
+            <div class="slo-container" id="sloContainer">
+                <div class="loading">Loading SLO status...</div>
+            </div>
+        </section>
+
+        <!-- ML Predictions Section -->
+        <section class="section">
+            <h2>ML-Based Predictive Alerts</h2>
+            <div class="predictions-container" id="predictionsContainer">
+                <div class="loading">Loading predictions...</div>
+            </div>
+        </section>
+
+        <!-- Prometheus Query Demos Section -->
+        <section class="section">
+            <h2>Prometheus Query Examples</h2>
+            <p class="section-description">Example PromQL queries you can use in Prometheus to monitor the system:</p>
+            <div class="query-demos">
+                <div class="query-card">
+                    <h4>Request Rate</h4>
+                    <div class="query-code">
+                        <code>rate(http_requests_total[5m])</code>
+                    </div>
+                    <p class="query-description">Calculate the per-second average rate of HTTP requests over the last 5 minutes</p>
+                </div>
+                <div class="query-card">
+                    <h4>Request Duration (P95)</h4>
+                    <div class="query-code">
+                        <code>histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))</code>
+                    </div>
+                    <p class="query-description">Calculate the 95th percentile latency of HTTP requests</p>
+                </div>
+                <div class="query-card">
+                    <h4>Error Rate</h4>
+                    <div class="query-code">
+                        <code>rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])</code>
+                    </div>
+                    <p class="query-description">Calculate the percentage of requests that result in 5xx errors</p>
+                </div>
+                <div class="query-card">
+                    <h4>SLI Compliance</h4>
+                    <div class="query-code">
+                        <code>sli_compliance_percentage{sli_name="timeline_latency"}</code>
+                    </div>
+                    <p class="query-description">Get the current SLI compliance percentage for timeline latency</p>
+                </div>
+                <div class="query-card">
+                    <h4>Cache Hit Rate</h4>
+                    <div class="query-code">
+                        <code>cache_hit_rate{cache_type="timeline"}</code>
+                    </div>
+                    <p class="query-description">Monitor cache hit rate for timeline cache</p>
+                </div>
+                <div class="query-card">
+                    <h4>Active Connections</h4>
+                    <div class="query-code">
+                        <code>active_connections{service="api"}</code>
+                    </div>
+                    <p class="query-description">Track the number of active connections to the API service</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grafana Graph Demos Section -->
+        <section class="section">
+            <h2>Grafana Visualization Examples</h2>
+            <p class="section-description">Example visualizations you can create in Grafana using the Prometheus data source:</p>
+            <div class="grafana-demos">
+                <div class="grafana-card">
+                    <h4>📈 Request Rate Over Time</h4>
+                    <div class="graph-placeholder">
+                        <div class="graph-demo">
+                            <div class="graph-bars">
+                                <div class="bar" style="height: 60%"></div>
+                                <div class="bar" style="height: 75%"></div>
+                                <div class="bar" style="height: 45%"></div>
+                                <div class="bar" style="height: 90%"></div>
+                                <div class="bar" style="height: 55%"></div>
+                                <div class="bar" style="height: 80%"></div>
+                                <div class="bar" style="height: 70%"></div>
+                                <div class="bar" style="height: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="graph-description">
+                        <strong>Query:</strong> <code>rate(http_requests_total[5m])</code><br>
+                        Shows the request rate trend over time, useful for identifying traffic patterns and spikes.
+                    </p>
+                </div>
+                <div class="grafana-card">
+                    <h4>⏱️ Latency Percentiles</h4>
+                    <div class="graph-placeholder">
+                        <div class="graph-demo">
+                            <div class="graph-lines">
+                                <div class="line p50" style="width: 100%"></div>
+                                <div class="line p95" style="width: 85%"></div>
+                                <div class="line p99" style="width: 70%"></div>
+                            </div>
+                            <div class="graph-labels">
+                                <span>P50</span>
+                                <span>P95</span>
+                                <span>P99</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="graph-description">
+                        <strong>Query:</strong> <code>histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))</code><br>
+                        Displays latency percentiles (P50, P95, P99) to understand response time distribution.
+                    </p>
+                </div>
+                <div class="grafana-card">
+                    <h4>✅ SLO Compliance Dashboard</h4>
+                    <div class="graph-placeholder">
+                        <div class="graph-demo">
+                            <div class="slo-gauge">
+                                <div class="gauge-fill" style="width: 95%"></div>
+                                <div class="gauge-label">95%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="graph-description">
+                        <strong>Query:</strong> <code>sli_compliance_percentage</code><br>
+                        Gauge visualization showing SLO compliance percentage. Green (≥90%), Yellow (80-90%), Red (&lt;80%).
+                    </p>
+                </div>
+                <div class="grafana-card">
+                    <h4>🔥 Error Rate Trend</h4>
+                    <div class="graph-placeholder">
+                        <div class="graph-demo">
+                            <div class="graph-error">
+                                <div class="error-line"></div>
+                                <div class="error-spikes">
+                                    <div class="spike" style="left: 20%; height: 15%"></div>
+                                    <div class="spike" style="left: 60%; height: 25%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="graph-description">
+                        <strong>Query:</strong> <code>rate(http_requests_total{status=~"5.."}[5m])</code><br>
+                        Line graph showing error rate over time, with alerts when threshold is exceeded.
+                    </p>
+                </div>
+                <div class="grafana-card">
+                    <h4>💾 Cache Performance</h4>
+                    <div class="graph-placeholder">
+                        <div class="graph-demo">
+                            <div class="graph-pie">
+                                <div class="pie-segment hit" style="--percentage: 85"></div>
+                                <div class="pie-segment miss" style="--percentage: 15"></div>
+                            </div>
+                            <div class="pie-labels">
+                                <span>Hit: 85%</span>
+                                <span>Miss: 15%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="graph-description">
+                        <strong>Query:</strong> <code>cache_hit_rate</code><br>
+                        Pie chart showing cache hit vs miss ratio, helping optimize caching strategies.
+                    </p>
+                </div>
+                <div class="grafana-card">
+                    <h4>🔗 Active Connections</h4>
+                    <div class="graph-placeholder">
+                        <div class="graph-demo">
+                            <div class="graph-stat">
+                                <div class="stat-value">247</div>
+                                <div class="stat-trend up">↑ 12%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="graph-description">
+                        <strong>Query:</strong> <code>active_connections</code><br>
+                        Stat panel showing current active connections with trend indicator.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Operations Section -->
+        <section class="section">
+            <h2>Available API Operations</h2>
+            <div class="operations-grid">
+                <div class="operation-card">
+                    <div class="operation-method get">GET</div>
+                    <div class="operation-content">
+                        <h4>/api/timeline/:userId</h4>
+                        <p>Get user timeline with distributed tracing</p>
+                        <div class="operation-tags">
+                            <span class="tag">Tracing</span>
+                            <span class="tag">Metrics</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-card">
+                    <div class="operation-method post">POST</div>
+                    <div class="operation-content">
+                        <h4>/api/tweet</h4>
+                        <p>Post a new tweet with success rate tracking</p>
+                        <div class="operation-tags">
+                            <span class="tag">SLO</span>
+                            <span class="tag">Tracing</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-card">
+                    <div class="operation-method get">GET</div>
+                    <div class="operation-content">
+                        <h4>/api/slo-status</h4>
+                        <p>Get current SLO compliance status</p>
+                        <div class="operation-tags">
+                            <span class="tag">SLO</span>
+                            <span class="tag">Monitoring</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-card">
+                    <div class="operation-method get">GET</div>
+                    <div class="operation-content">
+                        <h4>/api/predictions</h4>
+                        <p>Get ML-based predictive alerts</p>
+                        <div class="operation-tags">
+                            <span class="tag">ML</span>
+                            <span class="tag">Predictions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-card">
+                    <div class="operation-method get">GET</div>
+                    <div class="operation-content">
+                        <h4>/metrics</h4>
+                        <p>Prometheus metrics endpoint</p>
+                        <div class="operation-tags">
+                            <span class="tag">Prometheus</span>
+                            <span class="tag">Metrics</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-card">
+                    <div class="operation-method get">GET</div>
+                    <div class="operation-content">
+                        <h4>/health</h4>
+                        <p>Health check endpoint</p>
+                        <div class="operation-tags">
+                            <span class="tag">Health</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Observability Stack Dashboard | Lesson 49: Advanced Monitoring & Observability</p>
+            <p class="footer-links">
+                <a href="http://localhost:16686" target="_blank">Jaeger UI</a> |
+                <a href="http://localhost:9090" target="_blank">Prometheus</a> |
+                <a href="http://localhost:3001" target="_blank">Grafana</a> |
+                <a href="http://localhost:3000/metrics" target="_blank">Metrics</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
+
+
