@@ -1,0 +1,21 @@
+{
+  "name": "incident-response-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development node src/server.js",
+    "start": "NODE_ENV=production node src/server.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "redis": "^4.7.0",
+    "ws": "^8.18.0",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.3.2",
+    "@tensorflow/tfjs-node": "^4.21.0",
+    "uuid": "^10.0.0",
+    "nodemailer": "^6.9.14"
+  }
+}

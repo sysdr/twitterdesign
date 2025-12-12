@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident Response System</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Suppress React DevTools download message
+      const originalLog = console.log;
+      console.log = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('React DevTools') || message.includes('reactjs.org/link/react-devtools')) {
+          return; // Suppress this message
+        }
+        originalLog.apply(console, args);
+      };
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
