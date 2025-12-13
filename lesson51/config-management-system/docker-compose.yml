@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  config-management:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./config-repo:/app/config-repo
