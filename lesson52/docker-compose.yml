@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres-primary:
+    image: postgres:15-alpine
+    container_name: twitter-dr-primary
+    environment:
+      POSTGRES_DB: twitter_primary
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/primary:/var/lib/postgresql/data
+    command: >
+      postgres
+      -c wal_level=replica
+      -c archive_mode=on
+      -c archive_command='cp %p /var/lib/postgresql/wal/%f'
+      -c max_wal_senders=3
+      -c wal_keep_size=64
+
+  postgres-standby:
+    image: postgres:15-alpine
+    container_name: twitter-dr-standby
+    environment:
+      POSTGRES_DB: twitter_standby
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./database/standby:/var/lib/postgresql/data
+    depends_on:
+      - postgres-primary
+
+  backend:
+    build: ./backend
+    container_name: twitter-dr-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - PRIMARY_DB_HOST=postgres-primary
+      - STANDBY_DB_HOST=postgres-standby
+      - NODE_ENV=production
+    depends_on:
+      - postgres-primary
+      - postgres-standby
+    volumes:
+      - ./backend/logs:/app/logs
+
+  frontend:
+    build: ./frontend
+    container_name: twitter-dr-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
