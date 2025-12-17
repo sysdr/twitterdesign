@@ -1,0 +1,22 @@
+node_modules/
+dist/
+logs/
+.env
+.DS_Store
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+
+# Build artifacts
+coverage/
+*.log
+

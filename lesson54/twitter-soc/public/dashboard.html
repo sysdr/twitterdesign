@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Operations Center - Twitter SOC</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 Security Operations Center</h1>
+            <div class="status">
+                <span class="status-indicator" id="status">●</span>
+                <span id="statusText">Connected</span>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="eventsProcessed">0</div>
+                <div class="stat-label">Events Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="threatsDetected">0</div>
+                <div class="stat-label">Threats Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="incidentsResponded">0</div>
+                <div class="stat-label">Incidents Responded</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgProcessingTime">0ms</div>
+                <div class="stat-label">Avg Processing Time</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h2>Recent Threats</h2>
+                <div id="threatsList" class="threats-list"></div>
+            </div>
+
+            <div class="panel">
+                <h2>Compliance Report (24h)</h2>
+                <div id="complianceReport" class="compliance-report"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Threat Timeline</h2>
+            <div id="threatTimeline" class="timeline"></div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
