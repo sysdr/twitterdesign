@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  performance-system:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+      - "4001:4001"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    command: npm run dev
