@@ -1,0 +1,46 @@
+# Reference only — run manually if Docker is available.
+# Default mode uses in-process engine (no Docker needed).
+#
+# To use real Redpanda:
+#   docker compose up -d redpanda
+#   export NEXUS_MODE=redpanda
+#   export NEXUS_URL=http://localhost:8082
+#   export NEXUS_ADMIN_URL=http://localhost:9644
+#   npm run demo
+
+name: nexus-day-09
+services:
+  redpanda:
+    image: redpandadata/redpanda:v23.3.11
+    command:
+      - redpanda
+      - start
+      - --smp=1
+      - --memory=512M
+      - --overprovisioned
+      - --node-id=0
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://localhost:9092
+      - --pandaproxy-addr=0.0.0.0:8082
+      - --advertise-pandaproxy-addr=localhost:8082
+      - --rpc-addr=redpanda:33145
+      - --advertise-rpc-addr=redpanda:33145
+      - --mode=dev-container
+    ports:
+      - "9092:9092"
+      - "8082:8082"
+      - "9644:9644"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9644/v1/status/ready || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+
+volumes:
+  redpanda_data:

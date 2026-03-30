@@ -1,0 +1,13 @@
+{
+  "name": "nexus-day-09-commands-vs-events",
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "seed":  "node lesson_code.mjs",
+    "test":  "node test_lesson.mjs",
+    "demo":  "node lesson_code.mjs && node test_lesson.mjs",
+    "start": "node server.mjs"
+  },
+  "dependencies": {}
+}
