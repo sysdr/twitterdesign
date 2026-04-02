@@ -1,0 +1,2 @@
+# Day 14 is Node.js-only (embedding engine + dashboard).
+# Optional monorepo Python tools: ../../requirements.txt (repository root).

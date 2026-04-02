@@ -1,0 +1,29 @@
+# Reference only — run manually if Docker is available.
+# Default mode uses in-process engine (no Docker needed).
+#
+# To use real Ollama semantic embeddings:
+#   docker compose up -d ollama
+#   export NEXUS_MODE=ollama NEXUS_URL=http://localhost:11434
+#   export NEXUS_MODEL=nomic-embed-text
+#   npm run demo
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+
+volumes:
+  ollama_data:
